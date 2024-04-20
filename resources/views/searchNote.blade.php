@@ -29,7 +29,8 @@
             align-items: center;
             justify-content: center;
         }
-        #pdfViewer{
+
+        #pdfViewer {
             position: absolute;
             top: -100px;
             left: -500px;
@@ -41,7 +42,6 @@
 
 
         /* Hide scrollbars for webkit browsers */
-        
     </style>
     <!-- Styles -->
 
@@ -107,9 +107,9 @@
             </form>
         </div>
 
-        <div class="container ">
+        <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-3"> <!-- Adjust the column size based on your design -->
+                <div class="col-md-3">
                     <label for="faculty_id">Select Faculty:</label>
                     <select id="faculty_id" name="faculty_id" required onchange="updateSubjects()" class="form-control">
                         <option value="" selected disabled>Select Faculty</option>
@@ -121,14 +121,14 @@
 
                 <div class="col-md-3">
                     <label for="subject_id">Select Subject:</label>
-                    <select id="subject_id" name="subject_id" required placeholder="Select Subject" class="form-control">
+                    <select id="subject_id" name="subject_id" required placeholder="Select Subject" class="form-control" onchange="updateNotes()">
                         <!-- Options will be dynamically added using JavaScript -->
                     </select>
                 </div>
 
                 <div class="col-md-3">
                     <label for="category_id" class="pl-5">Select Category:</label>
-                    <select id="category_id" name="category_id" required class="form-control">
+                    <select id="category_id" name="category_id" required class="form-control" onchange="updateNotes()">
                         <option value="" selected disabled>Select Category</option>
                         @foreach ($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->category_name }}</option>
@@ -138,17 +138,19 @@
             </div>
         </div>
 
-        <div class="col-md-4 w-75 m-auto pt-5">
+
+        <div class="col-md-4 w-75 m-auto pt-5 ">
+
             <div class="book-item row">
                 @foreach ($approvedNotes as $note)
-                <div class="col-md-6 col-lg-4 mb-4">
+                <div class="col-md-6 col-lg-4 mb-4" data-note-id="{{ $note->id }}">
                     <div class="card card-small border-1 p-3 shadow-md rounded" style="max-width: 300px;">
                         <div id="img-div">
                             <iframe id="pdfViewer" src="{{ asset('storage/note/' . $note->file)}}" frameborder="0" scrolling="no"></iframe>
 
                         </div>
 
-                      
+
 
 
 
@@ -298,12 +300,6 @@
                 });
             });
         </script>
-
-
-
-
-
-
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Explicitly set the initial value of faculty_id
@@ -314,7 +310,6 @@
                 // Add event listeners to faculty, subject, and category dropdowns
                 facultyDropdown.addEventListener('change', function() {
                     updateSubjects();
-                    updateNotes();
                 });
                 document.getElementById('subject_id').addEventListener('change', updateNotes);
                 document.getElementById('category_id').addEventListener('change', updateNotes);
@@ -363,28 +358,14 @@
                 var subjectId = subjectDropdown.value;
                 var categoryId = categoryDropdown.value;
 
-                var url;
+                var url = '/getFilteredNotes?' + new URLSearchParams({
+                    faculty_id: facultyId,
+                    subject_id: subjectId,
+                    category_id: categoryId
+                });
 
-                if (!subjectId && !categoryId) {
-                    // If neither subject nor category is selected, fetch all notes related to the faculty
-                    url = `/getNotesByFaculty/${facultyId}`;
-                } else if (!subjectId && categoryId && !facultyId) {
-                    // If no subject or faculty is selected but category is selected, fetch notes based on the category
-                    url = `/getNotesByCategory/${categoryId}`;
-                } else if (!subjectId && categoryId && facultyId) {
-                    // If no subject is selected but category and faculty are selected, fetch notes based on both faculty and category
-                    url = `/getNotesByFacultyAndCategory?faculty_id=${facultyId}&category_id=${categoryId}`;
-                } else if (!categoryId) {
-                    // If a subject is selected and no category is selected, fetch notes based on both faculty and subject
-                    url = `/getNotesByFacultyAndSubject?faculty_id=${facultyId}&subject_id=${subjectId}`;
-                } else {
-                    // If a subject is selected, fetch notes based on both faculty, subject, and category
-                    url = `/getNotesByFacultyAndSubjectAndCategory?faculty_id=${facultyId}&subject_id=${subjectId}&category_id=${categoryId}`;
-                }
-                // Make an AJAX request to fetch notes
-                fetch(url, {
-                        cache: 'no-store'
-                    })
+                // Make an AJAX request to fetch notes based on selected filters
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         if (data.notes) {
@@ -397,77 +378,31 @@
             }
 
             function updateNotesUI(notes) {
-                var notesContainer = document.querySelector('.book-item');
-                notesContainer.innerHTML = ''; // Clear existing notes
+                // Select the container where notes are displayed
+                var notesContainer = document.querySelector('.book-item.row');
 
-                notes.forEach(note => {
-                    // Create HTML elements for each note and append them to the container
-                    var noteElement = createNoteElement(note);
-                    notesContainer.appendChild(noteElement);
+                // Loop through all notes displayed in the container
+                notesContainer.querySelectorAll('.col-md-6.col-lg-4.mb-4').forEach(function(noteElement) {
+                    // If the note is not present in the filtered result, hide it; otherwise, show it
+                    if (notes.find(function(note) {
+                            return note.id == noteElement.dataset.noteId;
+                        })) {
+                        noteElement.style.display = 'block';
+                    } else {
+                        noteElement.style.display = 'none';
+                    }
                 });
             }
-
-            function createNoteElement(note) {
-                var colDiv = document.createElement('div');
-                colDiv.className = 'col-md-6 col-lg-4 mb-4';
-
-                var cardDiv = document.createElement('div');
-                cardDiv.className = 'card card-small border-1 p-3 shadow-md rounded';
-                cardDiv.style.maxWidth = '300px';
-
-                if (note.id) { // Check if note.id is valid
-                    cardDiv.innerHTML = `
-                    <iframe id="pdfViewer" src="{{ asset('storage/note/' . $note->file)}}" frameborder="0"></iframe>
-            <div class="card-body">
-            <h5 class="card-title"><strong class="text-success">Faculty: {{ $note->faculty->faculty_name }}</strong></h5>
-<h5 class="card-title"><strong class="text-success">Subject: {{ $note->subject->subject_name }}</strong></h5>
-
-                <h5 class="card-title">${note.title}</h5>
-                <form action="{{route('viewNote',['note' => $note->id])}}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-success w-75% view-note-button">
-                                    <p>View note</p>
-                                </button>
-                            </form>
-               
-
-                            <div class="d-flex justify-content-between mt-3">
-               
-                <div class="d-flex justify-content-between mt-3">
-                    <form action="/like" method="POST" class="like-form">
-                        <input type="hidden" name="_token" value="your_csrf_token_here">
-                        <input type="hidden" name="note" value="${note.id}">
-                        <input type="hidden" name="liked" value="${note.liked ? '1' : '0'}">
-                        <button type="submit" class="btn btn-link like-btn">
-                            <i class="fa fa-thumbs-up like-icon" style="font-size: 20px;"></i>
-                            <p class="likes-count">${note.likes_count}</p>
-                        </button>
-                    </form>
-                </div>
-                <div class="d-flex justify-content-between">
-                    ${note.favoritedByUser ? `
-                    <form action="/notes/toggleFavorite" method="POST">
-                        <input type="hidden" name="_token" value="your_csrf_token_here">
-                        <input type="hidden" name="note" value="${note.id}">
-                        <button type="submit" class="btn btn-primary">
-                            <p><i class="fa fa-plus"></i> Add to favorites</p>
-                        </button>
-                    </form>` : `
-                    <button class="btn btn-primary" disabled>
-                        <p><i class="fa fa-plus"></i> Already in favorites</p>
-                    </button>`}
-                </div>
-            </div>
-        `;
-                } else {
-                    cardDiv.innerHTML = `<p>No valid note found</p>`;
-                }
-
-                colDiv.appendChild(cardDiv);
-
-                return colDiv;
-            }
         </script>
+
+
+
+
+
+
+
+
+
 
 
 

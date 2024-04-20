@@ -225,7 +225,7 @@ class NoteController extends Controller
         if ($search) {
             $approvedNotes = Note::where('status', 'approved')
                 ->where(function ($query) use ($search) {
-                    $query->where('tags', 'like', $search . '%' )
+                    $query->where('tags', 'like', $search . '%')
                         ->orWhere('title', 'like', $search . '%');
                 })
                 ->paginate(6);
@@ -239,77 +239,38 @@ class NoteController extends Controller
     }
 
 
-    public function getNotesByFacultyAndSubject(Request $request)
+    
+    public function getFilteredNotes(Request $request)
     {
+        // Validate the incoming request
         $request->validate([
             'faculty_id' => 'required|exists:faculties,id',
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_id' => 'nullable|exists:subjects,id',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
-        $facultyId = $request->input('faculty_id');
-        $subjectId = $request->input('subject_id');
-
-        // Fetch notes based on faculty and subject from your database
-        $notes = Note::where('faculty_id', $facultyId)
-            ->where('subject_id', $subjectId)
-            ->where('status', 'approved') // Adjust this condition based on your Note model
-            ->get();
-
-        // Return notes as a JSON response
-        return response()->json(['notes' => $notes]);
-    }
-    public function getNotesByFaculty($facultyId)
-    {
-        // Fetch all notes related to the faculty
-        $notes = Note::where('faculty_id', $facultyId)
-            ->where('status', 'approved') // Add this condition to fetch only approved notes
-            ->get();
-
-        // Return notes as a JSON response
-        return response()->json(['notes' => $notes]);
-    }
-    public function getNotesByFacultyAndCategory(Request $request)
-    {
-        $facultyId = $request->input('faculty_id');
-        $categoryId = $request->input('category_id');
-
-        $notes = Note::where('faculty_id', $facultyId)
-            ->where('category_id', $categoryId)
-            ->where('status', 'approved')
-            ->get();
-
-        return response()->json(['notes' => $notes])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-            ->header('Pragma', 'no-cache')
-            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
-    }
-
-    public function getNotesByFacultyAndSubjectAndCategory(Request $request)
-    {
+        // Extract filter parameters from the request
         $facultyId = $request->input('faculty_id');
         $subjectId = $request->input('subject_id');
         $categoryId = $request->input('category_id');
 
-        $notes = Note::where('faculty_id', $facultyId)
-            ->where('subject_id', $subjectId)
-            ->where('category_id', $categoryId)
-            ->where('status', 'approved')
-            ->get();
+        // Query notes based on filter parameters
+        $query = Note::where('faculty_id', $facultyId)
+            ->where('status', 'approved');
 
-        return response()->json(['notes' => $notes])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-            ->header('Pragma', 'no-cache')
-            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
-    }
-    public function getNotesByCategory($categoryId)
-    {
-        // Fetch notes based on the selected category
-        $notes = Note::where('category_id', $categoryId)
-            ->where('status', 'approved') // Add this condition to fetch only approved notes
-            ->get();
+        if ($subjectId) {
+            $query->where('subject_id', $subjectId);
+        }
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        // Fetch filtered notes
+        $notes = $query->get();
 
         // Return notes as a JSON response
-        return response()->json(['notes' => $notes])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-            ->header('Pragma', 'no-cache')
-            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
+        return response()->json(['notes' => $notes]);
     }
     public function toggleFavorite(Note $note)
     {

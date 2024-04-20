@@ -61,10 +61,7 @@ Route::get('/searchNote', [NoteController::class, 'searchApprovedNotes'])->name(
 Route::post('/like/{note}', [NoteController::class, 'like'])->name('like');
 Route::match(['get', 'post'], '/viewNote/{note}', [NoteController::class, 'viewNote'])->name('viewNote');
 
-Route::get('/getNotesByFacultyAndSubject', [NoteController::class, 'getNotesByFacultyAndSubject']);
-Route::get('/getNotesByFaculty/{facultyId}', [NoteController::class, 'getNotesByFaculty']);
-// For fetching notes by faculty and category
-Route::get('/getNotesByFacultyAndCategory', [NoteController::class, 'getNotesByFacultyAndCategory']);
+
 Route::get('/comment/{comment}/edit', [CommentController::class, 'edit'])->name('comment.edit');
 
 // Route for updating a comment
@@ -73,8 +70,7 @@ Route::put('/comment/{comment}', [CommentController::class, 'update'])->name('co
 // Route for deleting a comment
 Route::delete('/comment/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
 // For fetching notes by faculty, subject, and category
-Route::get('/getNotesByFacultyAndSubjectAndCategory', [NoteController::class, 'getNotesByFacultyAndSubjectAndCategory']);
-Route::get('/getNotesByCategory/{categoryId}', [NoteController::class, 'getNotesByCategory']);
+
 Route::get('/note/{noteId}/pdf-image', [NoteController::class, 'showPdfImage'])->name('note.pdf.image');
 Route::post('/notes/{note}/toggle-favorite', [NoteController::class, 'toggleFavorite'])
     ->name('notes.toggleFavorite');
@@ -134,4 +130,6 @@ Route::get('/confirmation', [PaymentController::class, 'confirmation'])->name('c
 Route::get('/paymentcheck', [PaymentController::class, 'checkPayment'])->name('paymentcheck');
 Route::get('/payment/detail', [PaymentController::class, 'paymentDetail'])->name('paymentDetail');
 Route::get('User/payment/detail', [PaymentController::class, 'UserPaymentDetail'])->name('UserPaymentDetail');
+// Routes
+Route::get('/getFilteredNotes', [NoteController::class, 'getFilteredNotes']);
 

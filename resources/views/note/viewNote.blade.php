@@ -87,7 +87,7 @@
         </div>
     </nav>
     <div class="m-5 p-3">
-        <div class="card m-4">
+        <div class="card mt-4 p-3 w-75 m-auto mb-4">
             <div class="card-header">
                 Note Details
             </div>
@@ -99,26 +99,27 @@
                 <p class="card-text">Tags: {{ $note->tags }}</p>
                 <p class="card-text text-danger">Uploaded date: {{ $note->updated_at }}</p>
             </div>
-        </div>
-
-        <div class="d-flex justify-content-between">
-            @auth
-            @if(!$note->favoritedByUser(auth()->user()))
-            <form action="{{ route('notes.toggleFavorite', ['note' => $note]) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-primary">
-                    <p><i class="fa fa-plus"></i> Add to favorites</p>
+            <div class="d-flex justify-content-between m-2">
+                @auth
+                @if(!$note->favoritedByUser(auth()->user()))
+                <form action="{{ route('notes.toggleFavorite', ['note' => $note]) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">
+                        <p><i class="fa fa-plus"></i> Add to favorites</p>
+                    </button>
+                </form>
+                @else
+                <button class="btn btn-primary" disabled>
+                    <p><i class="fa fa-plus"></i> Already in favorites</p>
                 </button>
-            </form>
-            @else
-            <button class="btn btn-primary" disabled>
-                <p><i class="fa fa-plus"></i> Already in favorites</p>
-            </button>
-            @endif
-            @else
+                @endif
+                @else
 
-            @endauth
+                @endauth
+            </div>
         </div>
+
+
         @if ($paymentDone)
         <div class="pdf-container d-flex align-items-center justify-content-center">
             <iframe src="{{ $filePath }}" width="70%" height="700"></iframe>
@@ -133,7 +134,7 @@
 
 
         </div>
-        <div class="card mt-4">
+        <div class="card mt-4 w-75 m-auto">
             <div class="card-header">
                 Unlock Premium Features To Enjoy Full Documentation
             </div>
@@ -162,7 +163,7 @@
                 @csrf
                 <input type="hidden" name="note_id" value="{{ $note->id }}">
                 <textarea name="comment_body" class="form-control" rows="3" required></textarea>
-                <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                <button type="submit" class="btn btn-danger mt-3">Submit</button>
             </form>
             @else
             <p>Please <a href="{{ route('login') }}">login</a> to leave a comment.</p>

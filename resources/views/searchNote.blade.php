@@ -99,15 +99,16 @@
 
     <div class="notes" style="margin-top: 5rem;">
         <div class="row justify-content-center">
-            <form action="{{ route('searchNote') }}" class="col-5 d-flex" method="GET">
+            <form action="{{ route('searchNote') }}" class="col-lg-5 col-md-8 col-sm-10 col-12 d-flex" method="GET">
                 <div class="form-group d-flex w-100 m-auto">
-                    <input type="search" name="search" style="border-radius: 20px; overflow: hidden;" class="form-control me-3 mb-5" placeholder="Search notes" aria-describedby="helpId" value="{{ $search }}" />
-                    <button type="submit" class=" search btn btn-danger ">Search</button>
+                    <input type="search" name="search" style="border-radius: 20px; overflow: hidden;" class="form-control me-3 mb-3 mb-sm-0" placeholder="Search notes" aria-describedby="helpId" value="{{ $search }}" />
+                    <button type="submit" class="search btn btn-danger">Search</button>
                 </div>
             </form>
         </div>
 
-        <div class="container">
+
+        <div class="container mb-4 mt-2">
             <div class="row justify-content-center">
                 <div class="col-md-3">
                     <label for="faculty_id">Select Faculty:</label>
@@ -139,12 +140,12 @@
         </div>
 
 
-        <div class="col-md-4 w-75 m-auto pt-5 ">
+        <div class="col-md-4 w-75 m-auto pt-2 mt-2">
 
             <div class="book-item row">
                 @foreach ($approvedNotes as $note)
                 <div class="col-md-6 col-lg-4 mb-4" data-note-id="{{ $note->id }}">
-                    <div class="card card-small border-1 p-3 shadow-md rounded" style="max-width: 300px;">
+                    <div class="card card-small border-2 p-3 shadow-lg " style="max-width: 300px; height:480px; border-radius:2rem;">
                         <div id="img-div">
                             <iframe id="pdfViewer" src="{{ asset('storage/note/' . $note->file)}}" frameborder="0" scrolling="no"></iframe>
 
@@ -158,10 +159,11 @@
 
 
 
-                        <div class="card-body">
-                            <p class="card-title"><strong class="text-success">Faculty:{{ $note->faculty->faculty_name }}</strong></p>
-                            <p class="card-title"><strong class="text-success">Subject:{{ $note->subject->subject_name }}</strong></p>
+                        <div class="note-title card-body">
                             <p class="card-title">{{ $note->title }}</p>
+                            <p class="card-title"><strong class="text-danger">Faculty:{{ $note->faculty->faculty_name }}</strong></p>
+                            <p class="card-title"><strong class="text-danger">Subject:{{ $note->subject->subject_name }}</strong></p>
+
 
                             <!-- Other note details -->
                             <!-- Like and dislike buttons -->
@@ -180,11 +182,11 @@
                                             <input type="hidden" name="liked" value="{{ $note->isLikedByUser(auth()->user()) ? '1' : '0' }}">
                                             <button type="submit" class="btn btn-link like-btn">
                                                 <i class="fa fa-thumbs-up like-icon" style="font-size: 20px;"></i>
-                                                <p class="likes-count">{{ $note->likesCount() }}</p>
+                                                <p class="likes-count ">{{ $note->likesCount() }}</p>
                                             </button>
                                         </form>
                                         @else
-                                        <p class="text-warning">Please <a href="{{ route('login') }}">login</a> to like and comment note.</p>
+                                        <p class="text-dark d-inline">Please <a href="{{ route('login') }}">login</a> to like and comment note.</p>
                                         @endauth
                                     </div>
                                 </div>

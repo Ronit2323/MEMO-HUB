@@ -2,6 +2,13 @@
 @section('title', 'Upload Note')
 
 @section('content')
+@include('sweetalert::alert')
+@if(session('error'))
+<div class="alert alert-danger" role="alert">
+    {{ session('error') }}
+</div>
+@endif
+
 <div class="container" style="margin-top: 70px;"> <!-- Adjust the margin-top value according to your needs -->
     <h2>Upload your notes here</h2>
     <form method="post" action="{{ route('notes.store') }}" enctype="multipart/form-data">
@@ -32,11 +39,11 @@
         <select id="category_id" name="category_id" ">
             <option value="" selected disabled>Select Note Type:</option>
             @foreach ($categories as $note)
-            <option value="{{ $note->id }}">{{ $note->category_name }}</option>
+            <option value=" {{ $note->id }}">{{ $note->category_name }}</option>
             @endforeach
         </select>
 
-      
+
         <div class="form-group">
             <label for="file">File:</label>
             <div class="input-group">

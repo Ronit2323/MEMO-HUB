@@ -74,7 +74,7 @@ class NoteController extends Controller
             'faculty_id' => 'required',
             'subject_id' => 'required',
             'category_id' => 'required',
-            'file' => 'required|file',
+            'file' => 'required|file|mimes:pdf,doc,docx|max:2048',
             'summary' => 'required',
             'tags' => 'required',
         ]);
@@ -84,6 +84,11 @@ class NoteController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = time() . '_' . $file->getClientOriginalName();
+            if (!$file->isValid()) {
+                // File upload failed, notify the user
+                Alert::error('Invalid File', 'Please upload a valid file in PDF!')->persistent(true);
+                return redirect()->back()->withInput();
+            }
 
             // Move the uploaded file to the 'public/note' directory
             $file->storeAs('note', $filename, 'public');

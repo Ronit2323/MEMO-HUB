@@ -27,6 +27,7 @@
                 <th scope="col">Subject</th>
                 <th scope="col">Faculty</th>
                 <th scope="col">Status</th>
+                <th scope="col">file</th>
                 <!-- <th scope="col">Image</th> -->
                 <th scope="col">Action</th>
 
@@ -40,10 +41,13 @@
                 <td>{{$note->subject->subject_name}}</td>
                 <td>{{$note->faculty->faculty_name}}</td>
                 <td style="{{ $note->status === 'approved' ? 'color: green;' : '' }}">{{ $note->status }}</td>
+                <td><a href="{{ asset('storage/note/' . $note->file) }}">
+            {{ $note->file }}</td>
+        </a>
 
 
                 <td>
-                    <a href="#" class="btn btn-primary ">Edit</a>
+                    <a href="{{route('notes.edit',$note->id)}}" class="btn btn-primary ">Edit</a>
 
 
 

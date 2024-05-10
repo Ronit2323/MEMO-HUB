@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\faculty;
 use App\Models\Moderator;
 use App\Models\User;
+use App\Models\FacultySubject;
 use App\Models\Favorite;
 use Illuminate\Http\Request;
 use App\Models\Payment;
@@ -129,16 +130,16 @@ class NoteController extends Controller
         return redirect()->route('notes.index');
     }
 
-    protected function generatePdfPreview(Note $note)
-    {
-        $pdfPath = storage_path('app/public/note/') . $note->file;
-        $previewPath = storage_path('app/public/note/previews/') . pathinfo($note->file, PATHINFO_FILENAME) . '_preview.jpg';
+    // protected function generatePdfPreview(Note $note)
+    // {
+    //     $pdfPath = storage_path('app/public/note/') . $note->file;
+    //     $previewPath = storage_path('app/public/note/previews/') . pathinfo($note->file, PATHINFO_FILENAME) . '_preview.jpg';
 
-        // Create the preview image
-        $pdf = new Pdf($pdfPath);
-        $pdf->setOutputFormat('jpeg');
-        $pdf->saveImage($previewPath);
-    }
+    //     // Create the preview image
+    //     $pdf = new Pdf($pdfPath);
+    //     $pdf->setOutputFormat('jpeg');
+    //     $pdf->saveImage($previewPath);
+    // }
 
     /**
      * Display the specified resource.
@@ -153,16 +154,85 @@ class NoteController extends Controller
      */
     public function edit(note $note)
     {
-        //
+        $user = auth()->user();
+        $faculties = Faculty::all();
+        $categories = Category::all();
+
+        // Retrieve subjects associated with the selected faculty
+        $selectedFaculty = $note->faculty_id;
+        $facultySubjects = FacultySubject::where('faculty_id', $selectedFaculty)->get();
+
+        // Extract subject IDs from faculty_subject records
+        $subjectIds = $facultySubjects->pluck('subject_id')->toArray();
+
+        // Retrieve subjects based on the extracted subject IDs
+        $subjects = Subject::whereIn('id', $subjectIds)->get();
+
+        return view('note.edit', compact('note', 'user', 'faculties', 'categories', 'subjects'));
     }
+
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, note $note)
-    {
-        //
+{
+    // Check if the note status is pending
+    if ($note->status === 'pending') {
+        // Validate the incoming request data
+        $request->validate([
+            'title' => 'required|string',
+            'summary' => 'required|string',
+            'tags' => 'nullable|string',
+            'faculty_id' => 'required|exists:faculties,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'category_id' => 'required|exists:categories,id',
+            'file' => 'nullable|file|mimes:pdf,doc,docx|max:2048', // Adjust file size as needed
+        ]);
+
+        // Update the note with the new data
+        $note->update([
+            'title' => $request->title,
+            'summary' => $request->summary,
+            'tags' => $request->tags,
+            'faculty_id' => $request->faculty_id,
+            'subject_id' => $request->subject_id,
+            'category_id' => $request->category_id,
+        ]);
+
+        // Handle file update if a new file is provided
+        if ($request->hasFile('file')) {
+            // Validate the file
+            $validated = $request->validate([
+                'file' => 'required|mimes:pdf,doc,docx|max:2048',
+            ]);
+
+            if ($validated) {
+                // Store the new file in the storage directory
+                $file = $request->file('file');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('note', $fileName, 'public');
+
+                // Update the file name in the note record
+                $note->file = $fileName;
+            } else {
+                // File upload failed due to validation, notify the user
+                return back()->with('error', 'Invalid file. Please upload a valid file (PDF, DOC, DOCX) with a maximum size of 2048 KB.');
+            }
+        }
+
+        // Save the changes to the note
+        $note->save();
+
+        // Redirect the user to the desired page with a success message
+        return redirect()->route('notes.index')->with('success', 'Note updated successfully!');
+    } else {
+        // Redirect the user back with a message indicating that update is not allowed
+        return back()->with('error', 'Note update is not allowed because the note has already been approved by a moderator.');
     }
+}
+
 
     /**
      * Remove the specified resource from storage.
@@ -244,7 +314,7 @@ class NoteController extends Controller
     }
 
 
-    
+
     public function getFilteredNotes(Request $request)
     {
         // Validate the incoming request

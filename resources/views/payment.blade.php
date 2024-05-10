@@ -98,6 +98,7 @@
 
     <div class="d-flex justify-content-center">
         <form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST">
+
             @csrf
             <input type="hidden" name="amount" value="{{ $amount }}">
             <input type="hidden" name="tax_amount" value="{{ $tax_amount }}">
@@ -112,7 +113,7 @@
             <input type="hidden" name="signature" value="{{ $signature }}">
             <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
 
-        
+
             <button type="submit" class="btn btn-success">Pay with eSewa</button>
         </form>
 

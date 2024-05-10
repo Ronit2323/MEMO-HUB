@@ -93,6 +93,9 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::get('subject/associate-form', [SubjectController::class, 'showAssociateForm'])->name('associate-form');
     Route::post('subject/associate', [SubjectController::class, 'associateWithFaculty'])->name('associate');
     Route::get('association-table', [association::class, 'index'])->name('association');
+    Route::delete('association-delete/{id}', [association::class, 'delete'])->name('deleteassociation');
+  
+
 });
 Route::group(['middleware' => ['auth', 'moderator']], function () {
     // Route::get('/moderator', function () {

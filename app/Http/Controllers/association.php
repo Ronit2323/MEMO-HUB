@@ -12,4 +12,12 @@ class association extends Controller
         $association = FacultySubject::paginate(7);
         return view('admin.associationtable', compact('association'));
     }
+    public function delete($id)
+    {
+        $facultySubject = FacultySubject::findOrFail($id);
+        $facultySubject->delete();
+        return redirect()->route('association');
+    }
+    
+   
 }

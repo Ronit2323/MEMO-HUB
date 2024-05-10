@@ -52,7 +52,7 @@ class PaymentController extends Controller
         $failure_url = 'https://google.com';
         $product_service_charge = 0;
         $product_delivery_charge = 0;
-        $tax_amount = "10"; // Tax amount is zero
+        $tax_amount = "10"; 
         $total_amount = $amount + $tax_amount;
         $transaction_uuid = uniqid();
         $product_code = 'EPAYTEST';
@@ -97,7 +97,7 @@ class PaymentController extends Controller
             'signature' => $signature,
         ]);
 
-        // Check if the request was successful
+      
         try {
             if ($response->successful()) {
                 // Populate Payment model and save to database

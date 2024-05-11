@@ -64,6 +64,12 @@ class ChatController extends Controller
             ->with('user') // Assuming user relation exists
             ->get();
 
+        foreach ($messages as $message) {
+            // Check if the logged-in user is the owner of the message
+            $message->isOwner = ($message->user->id === Auth::id());
+        }
+
+
         // If you only want to include certain fields from the user model (like user_name),
         // you can specify them in the select method.
         // For example:
@@ -72,5 +78,27 @@ class ChatController extends Controller
         // }])
 
         return response()->json($messages);
+    }
+
+    public function deleteMessage($id)
+    {
+        // Find the message by its ID
+        $message = Chat::find($id);
+
+        // Check if the message exists
+        if (!$message) {
+            return response()->json(['success' => false, 'error' => 'Message not found'], 404);
+        }
+
+        // Check if the authenticated user is the owner of the message
+        if ($message->user_id !== auth()->id()) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
+        // Delete the message
+        $message->delete();
+
+        // Return a success response
+        return response()->json(['success' => true]);
     }
 }

@@ -8,7 +8,7 @@
         <div class="col-md-6 mx-auto"> <!-- Adjust the column width as needed -->
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="Search Notes" name="search">
-                
+
             </div>
         </div>
     </div>
@@ -42,8 +42,8 @@
                 <td>{{$note->faculty->faculty_name}}</td>
                 <td style="{{ $note->status === 'approved' ? 'color: green;' : '' }}">{{ $note->status }}</td>
                 <td><a href="{{ asset('storage/note/' . $note->file) }}">
-            {{ $note->file }}</td>
-        </a>
+                        {{ $note->file }}</td>
+                </a>
 
 
                 <td>

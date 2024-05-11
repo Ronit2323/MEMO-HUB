@@ -80,6 +80,10 @@ Route::post('/SeeComments', [CommentController::class, 'store'])->name('comment.
 Route::post('/StoreChat', [ChatController::class, 'store'])->name('chat.sendMessage');
 Route::get('/fetchMessages', [ChatController::class, 'fetchMessages']);
 
+
+Route::delete('/deleteMessage/{id}', [ChatController::class, 'deleteMessage'])->name('deleteMessage');
+
+
 Route::group(['middleware' => ['auth', 'admin']], function () {
     // Route::get('/admin', function () {
     //     return view('admin.dashboard');

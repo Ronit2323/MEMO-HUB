@@ -284,7 +284,45 @@
                         </div>
                     </div>
 
+
+
+
                 </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card  h-200">
+                            <div class="card-body">
+                                @if($paymentData)
+                                <p>Your subscription plan:{{$paymentData->subscription->plan_name }}</p>
+                                <p>You have made a payment on {{ $paymentData->created_at }}.</p>
+                                <p>Plan Start date:{{$paymentData->subscription->start_date }}</p>
+                                <p>Plan End date:{{$paymentData->subscription->end_date }}</p>
+                                <!-- Display other payment information here -->
+                                @else
+                                <p  href="{{ route('subscriptions.create') }}?userId={{ Auth::id() }}">Join our subscription plan to enjoy unlimited access to notes</p>
+                               
+
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="card h-200">
+                            <div class="card-body">
+                                <h5 class="card-title">Recently uploaded</h5>
+                                @foreach ($notes as $note)
+                                <p class="card-text">{{ $note['title'] }} - {{ $note['status'] }}</p>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
                 @if (session('paymentData'))
                 <form action="{{ route('payment.store') }}" method="post">
                     @csrf

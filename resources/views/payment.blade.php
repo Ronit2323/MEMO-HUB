@@ -74,6 +74,7 @@
     <div class="row d-flex align-items-center justify-content-center mt-5">
         <h1 class="text-center mt-5">
             <span class="text-danger">Details</span> of Subscription Bought
+            <h6 class="text-center text-danger">*You cannot cancel the subscription after payment</h6>
         </h1>
         <div class="col-lg-8">
             <div class="card mb-4">

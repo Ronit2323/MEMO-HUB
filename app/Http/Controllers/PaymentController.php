@@ -48,11 +48,18 @@ class PaymentController extends Controller
     {
         $userId = Auth::id();
         $subscription = Subscription::where('user_id', $userId)->latest()->first();
-        $amount = "100";
+        if ($subscription) {
+            // Get the amount based on the plan name
+            $planName = $subscription->plan_name;
+            $amount = ($planName == 'monthly') ? 1200 : 10000;
+        } else {
+            // Set a default amount if the user doesn't have an active subscription
+            $amount = 100; // Default amount
+        }
         $failure_url = 'https://google.com';
         $product_service_charge = 0;
         $product_delivery_charge = 0;
-        $tax_amount = "10"; 
+        $tax_amount = "10";
         $total_amount = $amount + $tax_amount;
         $transaction_uuid = uniqid();
         $product_code = 'EPAYTEST';
@@ -97,7 +104,7 @@ class PaymentController extends Controller
             'signature' => $signature,
         ]);
 
-      
+
         try {
             if ($response->successful()) {
                 // Populate Payment model and save to database

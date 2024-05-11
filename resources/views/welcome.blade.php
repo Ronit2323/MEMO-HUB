@@ -210,23 +210,29 @@
     </div>
     <div class="premium-feature-content">
         <h1>Discover <span class="text-danger">Premium</span> Benefits</h1>
+        <p>Premium users get unlimited access to notes</p>
 
-
-
-        <p>Premium users gets unlimited access to notes</p>
+        @auth
+        @if(Auth::user()->hasActiveSubscription())
+        <div class="alert alert-info" role="alert">
+            You already have an active subscription. Please wait until it expires.
+        </div>
+        @else
         <div class="card h-50 d-flex align-items-center justify-content-center">
             <p>Different premium subscription plans just for you</p>
             <p>Unlock Full Access with Premium!</p>
             <h5 class="mb-4"> Get started</h5>
-            @auth
             <a class="btn btn-danger" href="{{ route('subscriptions.create') }}?userId={{ Auth::id() }}">Get started</a>
-            @else
-            <a class="btn btn-danger" href="{{ route('login') }}">Log in to subscribe</a>
-            @endauth
         </div>
-
-
+        @endif
+        @else
+        <div class="alert alert-info" role="alert">
+            You need to log in to subscribe.
+        </div>
+        <a class="btn btn-danger" href="{{ route('login') }}">Log in to subscribe</a>
+        @endauth
     </div>
+
     <div class="faq">
         <div class="accordion accordion-flush" id="accordionFlushExample">
             <div class="accordion-item">

@@ -70,7 +70,7 @@ class SubjectController extends Controller
      */
     public function edit(subject $subject)
     {
-        return view('subject.edit', compact('subject'));
+        return view('subject.edit', compact('subject')); // method retrieves a specific Subject object from the database based on its ID, and then passes that object to a view for editing. T
     }
 
     /**

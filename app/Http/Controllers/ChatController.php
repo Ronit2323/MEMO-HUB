@@ -13,8 +13,9 @@ class ChatController extends Controller
 {
     public function index()
     {
-        $subjects = Subject::all();
-        $faculties = Faculty::all();
+        $subjects = Subject::all(); //collection of subject object
+
+        $faculties = Faculty::all();//collection of faculty object
         $selectedFacultyId = null; // Set initial value to null
         $selectedSubjectId = null; // Set initial value to null
         return view('user.chat', compact('subjects', 'faculties', 'selectedFacultyId', 'selectedSubjectId'));
